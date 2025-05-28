@@ -1,27 +1,24 @@
 import { createContext, useReducer } from "react";
 
-// 1. Create context with default structure
+
 const CartContext = createContext({
   items: [],
   addItem: (item) => {},
-  removeItem: (id) => {},
+  removeItem: (id) => {}
 });
 
-// 2. Reducer function to handle cart state changes
 function cartReducer(state, action) {
-  if (action.type === 'ADD_ITEM') {
-    const existingCartItemIndex = state.items.findIndex(
-      (item) => item.id === action.item.id
-    );
+  if (action.type === "ADD_ITEM") {
+    const existingIndex = state.items.findIndex(item => item.id === action.item.id);
     const updatedItems = [...state.items];
 
-    if (existingCartItemIndex > -1) {
-      const existingItem = state.items[existingCartItemIndex];
+    if (existingIndex > -1) {
+      const existingItem = state.items[existingIndex];
       const updatedItem = {
         ...existingItem,
-        quantity: existingItem.quantity + 1,
+        quantity: existingItem.quantity + 1
       };
-      updatedItems[existingCartItemIndex] = updatedItem;
+      updatedItems[existingIndex] = updatedItem;
     } else {
       updatedItems.push({ ...action.item, quantity: 1 });
     }
@@ -29,24 +26,19 @@ function cartReducer(state, action) {
     return { ...state, items: updatedItems };
   }
 
-  if (action.type === 'REMOVE_ITEM') {
-    const existingCartItemIndex = state.items.findIndex(
-      (item) => item.id === action.id
-    );
-
+  if (action.type === "REMOVE_ITEM") {
+    const existingIndex = state.items.findIndex(item => item.id === action.id);
+    const existingItem = state.items[existingIndex];
     const updatedItems = [...state.items];
 
-    if (existingCartItemIndex > -1) {
-      const existingItem = state.items[existingCartItemIndex];
-      if (existingItem.quantity === 1) {
-        updatedItems.splice(existingCartItemIndex, 1);
-      } else {
-        const updatedItem = {
-          ...existingItem,
-          quantity: existingItem.quantity - 1,
-        };
-        updatedItems[existingCartItemIndex] = updatedItem;
-      }
+    if (existingItem.quantity === 1) {
+      updatedItems.splice(existingIndex, 1);
+    } else {
+      const updatedItem = {
+        ...existingItem,
+        quantity: existingItem.quantity - 1
+      };
+      updatedItems[existingIndex] = updatedItem;
     }
 
     return { ...state, items: updatedItems };
@@ -55,7 +47,6 @@ function cartReducer(state, action) {
   return state;
 }
 
-// 3. Context Provider component
 export function CartContextProvider({ children }) {
   const [cart, dispatchCartAction] = useReducer(cartReducer, { items: [] });
 
@@ -70,7 +61,7 @@ export function CartContextProvider({ children }) {
   const contextValue = {
     items: cart.items,
     addItem,
-    removeItem,
+    removeItem
   };
 
   return (
