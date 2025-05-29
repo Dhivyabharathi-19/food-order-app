@@ -11,11 +11,13 @@ function Modal({children, open , className = ''}){
 
 
   useEffect(() => {
- 
+     const modal = dialog.current;
    if (open) {
-       dialog.current.showModal();
+       modal.showModal();
    }
 
+
+       return () => modal.close();
   },[open]);
 
 
