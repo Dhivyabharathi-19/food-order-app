@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext} from "react";
 import Modal from "./Modal";
 import CartContext from "../../store/CartContext";
 import { currencyFormatter } from "../../util/formatting";
@@ -22,9 +22,10 @@ export default function Checkout() {
 
       const {
         data, 
-        isLoading: isSending,
+         isLoading: isSending,
          error, 
          sendRequest,
+         clearData,
 
       }= useHttp("http://localhost:3000/orders", requestConfig);
   
@@ -36,6 +37,13 @@ export default function Checkout() {
      userProgressCtx.hideCheckout();
    } 
 
+   function handleFinish(){
+     userProgressCtx.hideCheckout();
+     cartCtx.clearCart();
+     clearData();
+   }
+
+  
    function  handleSubmit(event) {
          event.preventDefault();
 
@@ -43,7 +51,7 @@ export default function Checkout() {
         const fd =   new FormData(event.target);
         const customerData = Object.fromEntries(fd.entries()); //{email: test@example.com}
     
-        sendRequest(JSON.stringify({
+           sendRequest(JSON.stringify({
                       order:{
               items: cartCtx.items,
               customer: customerData,
@@ -64,10 +72,11 @@ export default function Checkout() {
           })
         });
    }
-  
+
+   
     let actions = (
       <>
-       <Button type="button" textOnly onClick={handleClose}>Close</Button>
+       <Button type="button" textOnly onClick={handleFinish}>Close</Button>
                     <Button>Submit Order</Button>
       </>
     )
@@ -78,14 +87,16 @@ export default function Checkout() {
 
 
    if(data && !error) {
-     return <Modal open={userProgressCtx.progress === 'checkout'} onClose={handleClose} >
+     return (
+      <Modal open={userProgressCtx.progress === 'checkout'} onClose={handleFinish} >
      <h2>Success!</h2>
      <p>Your order was submitted successfully.</p>
      <p>We will get back to you with more details  via email within the next few minutes.</p>
      <p className="modal-actions">
-       <Button onClick={handleClose}>Okay</Button>
+       <Button onClick={handleFinish}>Okay</Button>
      </p>
      </Modal>
+     );
    }
 
 
